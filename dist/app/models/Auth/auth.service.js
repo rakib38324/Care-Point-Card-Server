@@ -50,10 +50,8 @@ const resendEmailVerification = (payload) => __awaiter(void 0, void 0, void 0, f
     if (isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.verified) {
         throw new appError_1.default(http_status_codes_1.default.NOT_FOUND, 'Your email already verified.');
     }
-    const name = (isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.firstName) + ' ' + (isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.lastName);
     const jwtPayload = {
         email,
-        name: name,
         role: isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.role,
         _id: isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists._id,
     };
@@ -96,12 +94,10 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     if (!(isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.verified)) {
         throw new appError_1.default(http_status_codes_1.default.FORBIDDEN, 'You are not verified. Please verify your account.');
     }
-    const name = (isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.firstName) + ' ' + (isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.lastName);
     //-====> access granted: send accessToken, RefreshToken
     const jwtPayload = {
         _id: isUserExists._id,
         email: isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.email,
-        name: name,
         role: isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.role,
     };
     //===========> create token and sent to the client
@@ -149,11 +145,9 @@ const forgetPassword = (email) => __awaiter(void 0, void 0, void 0, function* ()
     if (!isUserExists) {
         throw new appError_1.default(http_status_codes_1.default.NOT_FOUND, 'No Account found. Please check your email.');
     }
-    const name = (isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.firstName) + ' ' + (isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.lastName);
     const jwtPayload = {
         _id: isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists._id,
         email: isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.email,
-        name: name,
         role: isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.role,
     };
     //===========> create token and sent to the client

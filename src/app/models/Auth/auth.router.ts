@@ -27,7 +27,7 @@ router.post(
 
 router.post(
   '/change-password',
-  Auth(USER_ROLE.admin, USER_ROLE.superAdmin, USER_ROLE.user),
+  Auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   ValidateRequest(authValidations.changePasswordValidationSchema),
   authControllers.changePassword,
 );
@@ -44,6 +44,6 @@ router.post(
   authControllers.resetPassword,
 );
 
-router.get('/me', Auth('superAdmin', 'admin', 'user'), authControllers.getMe);
+router.get('/me', Auth('superAdmin', 'admin'), authControllers.getMe);
 
 export const loginRouters = router;

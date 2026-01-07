@@ -11,33 +11,27 @@ const userSchema = new Schema<TUser, UserModel>(
   {
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
-    phone: { type: String, required: true },
-    address: { type: String, required: true },
-    country: { type: String },
-    img: { type: String },
-    sponsorType: { type: String },
     verified: { type: Boolean, default: false },
     role: {
       type: String,
-      enum: ['superAdmin', 'admin', 'user'],
-      default: 'user',
+      enum: [
+        'superAdmin',
+        'admin',
+        'member',
+        'docotr',
+        'sponsor',
+        'ngo',
+        'employer',
+        'provider',
+      ],
     },
     status: {
       type: String,
-      enum: ['Active', 'Block'],
+      enum: ['Active', 'Block', 'Deleted', 'Suspended'],
       default: 'Active',
     },
-    userType: {
-      type: String,
-      enum: ['Sponsor', 'Member'],
-    },
+
     passwordChangedAt: { type: Date },
-    subscribetionId: {
-      type: Schema.Types.ObjectId,
-      ref: 'Payment', // Make sure the ref matches the model name
-    },
   },
   {
     timestamps: true,
@@ -54,8 +48,6 @@ userSchema.pre('save', async function (next) {
       Number(config.bcrypt_salt_round),
     );
   }
-
-
 });
 
 // userSchema.pre('findOneAndUpdate', async function (next) {

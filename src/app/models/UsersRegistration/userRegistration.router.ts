@@ -11,17 +11,13 @@ router.post(
   userControllers.createUsers,
 );
 
-router.get(
-  '/get-me',
-  Auth('superAdmin', 'admin', 'user'),
-  userControllers.getMe,
-);
+router.get('/get-me', Auth('superAdmin', 'admin'), userControllers.getMe);
 router.get('/', Auth('admin', 'superAdmin'), userControllers.getAllUsers);
 router.get('/:id', Auth('admin', 'superAdmin'), userControllers.getSingleUser);
 
 router.patch(
   '/update-user/:id',
-  Auth('superAdmin', 'admin', 'user'),
+  Auth('superAdmin', 'admin'),
   ValidateRequest(UserValidations.updateUserValidationSchema),
   userControllers.updateUsers,
 );

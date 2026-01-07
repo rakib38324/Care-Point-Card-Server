@@ -59,10 +59,8 @@ const resendEmailVerification = async (payload: { email: string }) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Your email already verified.');
   }
 
-  const name = isUserExists?.firstName + ' ' + isUserExists?.lastName;
   const jwtPayload = {
     email,
-    name: name,
     role: isUserExists?.role,
     _id: isUserExists?._id,
   };
@@ -133,12 +131,10 @@ const loginUser = async (payload: TLoginUser) => {
     );
   }
 
-  const name = isUserExists?.firstName + ' ' + isUserExists?.lastName;
   //-====> access granted: send accessToken, RefreshToken
   const jwtPayload: TJwtPayload = {
     _id: isUserExists._id,
     email: isUserExists?.email,
-    name: name,
     role: isUserExists?.role,
   };
 
@@ -223,11 +219,9 @@ const forgetPassword = async (email: string) => {
     );
   }
 
-  const name = isUserExists?.firstName + ' ' + isUserExists?.lastName;
   const jwtPayload = {
     _id: isUserExists?._id,
     email: isUserExists?.email,
-    name: name,
     role: isUserExists?.role,
   };
 
