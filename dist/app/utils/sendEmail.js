@@ -22,13 +22,13 @@ const sendEmail = (subject, to, html) => __awaiter(void 0, void 0, void 0, funct
         secure: config_1.default.NODE_ENV === 'develop',
         auth: {
             // TODO: replace `user` and `pass` values from <https://forwardemail.net>
-            user: 'geshesimua@gmail.com',
-            pass: 'lhta rzte lmio odlv',
+            user: config_1.default.email_app_user,
+            pass: config_1.default.email_app_password,
         },
     });
     yield transporter.sendMail({
         // from: 'aminul15-3832@diu.edu.bd', // sender address
-        from: 'geshesimua@gmail.com', // sender address
+        from: config_1.default.email_app_user, // sender address
         to, // list of receivers
         subject, // Subject line
         text: '', // plain text body

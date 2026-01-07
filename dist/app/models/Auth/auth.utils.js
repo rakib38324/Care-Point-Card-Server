@@ -19,14 +19,12 @@ const VerifyToken = (token, secret) => {
     const decoded = jsonwebtoken_1.default.verify(token, secret);
     // Make sure all fields exist
     if (!decoded.email ||
-        !decoded.name ||
         !decoded.role ||
         !decoded._id) {
         throw new Error('Invalid token payload');
     }
     return {
         email: decoded.email,
-        name: decoded.name,
         role: decoded.role,
         _id: decoded._id,
     };

@@ -16,16 +16,11 @@ const config_1 = __importDefault(require("../config/config"));
 const user_constent_1 = require("../models/UsersRegistration/user.constent");
 const userRegistration_model_1 = require("../models/UsersRegistration/userRegistration.model");
 const superUser = {
-    firstName: 'You are Supper',
-    lastName: 'Admin',
-    phone: '+880123456789',
-    email: 'admin12@gmail.com',
+    email: 'admin_carepoint@gmail.com',
     password: config_1.default.super_admin_password,
     role: user_constent_1.USER_ROLE.superAdmin,
     verified: true,
-    userType: 'Member',
     status: 'Active',
-    address: 'ABC DEF, City, Country.',
 };
 const seedSuperAdmin = () => __awaiter(void 0, void 0, void 0, function* () {
     // when database is connected, we will check is there any user who is super admin

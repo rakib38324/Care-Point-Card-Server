@@ -22,33 +22,17 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const userSchema = new mongoose_1.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
-    phone: { type: String, required: true },
-    address: { type: String, required: true },
-    country: { type: String },
-    img: { type: String },
-    sponsorType: { type: String },
     verified: { type: Boolean, default: false },
     role: {
         type: String,
-        enum: ['superAdmin', 'admin', 'user'],
-        default: 'user',
+        enum: ['superAdmin', 'admin', 'member', 'docotr', 'sponsor', 'ngo', 'employer', 'provider'],
     },
     status: {
         type: String,
-        enum: ['Active', 'Block'],
+        enum: ['Active', 'Block', 'Deleted', 'Suspended'],
         default: 'Active',
     },
-    userType: {
-        type: String,
-        enum: ['Sponsor', 'Member'],
-    },
     passwordChangedAt: { type: Date },
-    subscribetionId: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: 'Payment', // Make sure the ref matches the model name
-    },
 }, {
     timestamps: true,
 });
