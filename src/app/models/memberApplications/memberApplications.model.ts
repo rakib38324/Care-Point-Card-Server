@@ -9,7 +9,7 @@ const familyMemberSchema = new Schema(
   {
     fullName: { type: String, required: true },
     relationship: { type: String, required: true },
-    dateOfBirth: { type: Date },
+    dateOfBirth: { type: String },
   },
   { _id: false },
 );
@@ -19,11 +19,7 @@ const familyMemberSchema = new Schema(
  */
 const memberApplicationsSchema = new Schema<TMemberApplications>(
   {
-    userId: {
-      type: String,
-      required: true,
-      index: true,
-    },
+    userId: Schema.Types.ObjectId,
 
     // ================= Personal Information =================
     fullName: { type: String, required: true },

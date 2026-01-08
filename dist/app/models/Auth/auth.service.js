@@ -113,7 +113,7 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const userData = {
         email: userInformation === null || userInformation === void 0 ? void 0 : userInformation.email,
         role: userInformation === null || userInformation === void 0 ? void 0 : userInformation.role,
-        status: userInformation === null || userInformation === void 0 ? void 0 : userInformation.status
+        status: userInformation === null || userInformation === void 0 ? void 0 : userInformation.status,
     };
     return {
         user: userData,

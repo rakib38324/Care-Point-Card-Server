@@ -21,7 +21,7 @@ export type TMemberApplications = {
   familyMembers?: {
     fullName: string;
     relationship: string;
-    dateOfBirth?: Date;
+    dateOfBirth?: String;
   }[];
 
   // ================= Health Information =================

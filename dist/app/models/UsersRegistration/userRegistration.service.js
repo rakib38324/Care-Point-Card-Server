@@ -79,8 +79,8 @@ const createUserIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function
     //     <div style="text-align:center; background-color:#f4f4f4; padding:20px; font-size:12px; color:#888888;">
     //       <p style="margin:0;">&copy; 2026 Care Points Global</p>
     //       <p style="margin:10px 0;">
-    //         <a href="#" style="color:#0072C6; text-decoration:none; margin:0 5px;">Privacy Policy</a> | 
-    //         <a href="#" style="color:#0072C6; text-decoration:none; margin:0 5px;">Terms of Service</a> | 
+    //         <a href="#" style="color:#0072C6; text-decoration:none; margin:0 5px;">Privacy Policy</a> |
+    //         <a href="#" style="color:#0072C6; text-decoration:none; margin:0 5px;">Terms of Service</a> |
     //         <a href="#" style="color:#0072C6; text-decoration:none; margin:0 5px;">Help Center</a>
     //       </p>
     //     </div>
@@ -123,8 +123,7 @@ const getSingleUserFromDB = (_id) => __awaiter(void 0, void 0, void 0, function*
     return result;
 });
 const getMeFromDB = (email) => __awaiter(void 0, void 0, void 0, function* () {
-    const userExists = yield userRegistration_model_1.User.findOne({ email: email })
-        .select('-password');
+    const userExists = yield userRegistration_model_1.User.findOne({ email: email }).select('-password');
     if (!userExists) {
         throw new appError_1.default(http_status_codes_1.default.NOT_FOUND, 'User Information is not found.');
     }

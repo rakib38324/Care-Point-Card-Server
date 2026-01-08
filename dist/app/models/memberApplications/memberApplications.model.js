@@ -9,17 +9,13 @@ const mongoose_1 = require("mongoose");
 const familyMemberSchema = new mongoose_1.Schema({
     fullName: { type: String, required: true },
     relationship: { type: String, required: true },
-    dateOfBirth: { type: Date },
+    dateOfBirth: { type: String },
 }, { _id: false });
 /**
  * ================= Main Schema =================
  */
 const memberApplicationsSchema = new mongoose_1.Schema({
-    userId: {
-        type: String,
-        required: true,
-        index: true,
-    },
+    userId: mongoose_1.Schema.Types.ObjectId,
     // ================= Personal Information =================
     fullName: { type: String, required: true },
     dateOfBirth: { type: String, required: true },
