@@ -5,7 +5,7 @@ const passwordMinLength = 8;
 
 const createUserValidationSchema = z.object({
   body: z.object({
-    email: z.email({ error: 'Email is required.' }),
+    email: z.email(),
     password: z
       .string({ error: 'Password is required.' })
       .refine((data) => data.length >= passwordMinLength, {

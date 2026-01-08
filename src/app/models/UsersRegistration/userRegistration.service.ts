@@ -3,7 +3,7 @@ import httpStatus from 'http-status-codes';
 import { TUser } from './userRegistration.interface';
 import AppError from '../../errors/appError';
 import { User } from './userRegistration.model';
-import { createToken } from '../Auth/auth.utils';
+import { createToken, TJwtPayload } from '../Auth/auth.utils';
 import config from '../../config/config';
 import { sendEmail } from '../../utils/sendEmail';
 
@@ -34,65 +34,86 @@ const createUserIntoDB = async (payload: TUser) => {
 
   const user = await User.create(userInfo);
 
-  const jwtPayload = {
-    email,
-    role: role,
-    _id: user?._id,
+  //-====> access granted: send accessToken, RefreshToken
+  const jwtPayload: TJwtPayload = {
+    _id: user._id,
+    email: user?.email,
+    role: user?.role,
   };
+
   //===========> create token and sent to the client
-  const resetToken = createToken(
+  const accessToken = createToken(
     jwtPayload,
     config.jwt_access_secret as string,
-    '20m',
+    config.jwt_access_expires_in as string,
   );
 
-  const resetUILink = `${config.email_vErification_ui_link}?email=${email}&token=${resetToken}`;
+  //===========> create refresh token and sent to the client
+  const refreshToken = createToken(
+    jwtPayload,
+    config.jwt_refresh_secret as string,
+    config.jwt_access_expires_in as string,
+  );
 
-  const subject = 'Verification email from Care Points Card Global.';
+  //   const jwtPayload = {
+  //     email,
+  //     role: role,
+  //     _id: user?._id,
+  //   };
+  //   //===========> create token and sent to the client
+  //   const resetToken = createToken(
+  //     jwtPayload,
+  //     config.jwt_access_secret as string,
+  //     '20m',
+  //   );
 
-  const html = `
-  <body style="margin:0; padding:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color:#f4f4f4;">
-  <div style="max-width:600px; margin:40px auto; background-color:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+  //   const resetUILink = `${config.email_vErification_ui_link}?email=${email}&token=${resetToken}`;
 
-    <!-- Header -->
-    <div style="background-color:#0072C6; color:#ffffff; text-align:center; padding:25px;">
-      <h2 style="margin:0; font-size:24px;">Welcome to Care Points Global</h2>
-      <p style="margin:5px 0 0; font-size:14px; opacity:0.85;">Secure your account by verifying your email</p>
-    </div>
+  //   const subject = 'Verification email from Care Points Card Global.';
 
-    <!-- Body -->
-    <div style="padding:25px; color:#333333;">
-      <h3 style="font-size:18px; margin-bottom:15px;">Hello Dear,</h3>
-      <p style="line-height:1.6; margin-bottom:20px;">
-        Thank you for registering with us! To complete your registration and activate your account, please verify your email address by clicking the button below:
-      </p>
+  //   const html = `
+  //   <body style="margin:0; padding:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color:#f4f4f4;">
+  //   <div style="max-width:600px; margin:40px auto; background-color:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
 
-      <p style="text-align:center; margin-bottom:20px;">
-        <a href="${resetUILink}" style="display:inline-block; padding:12px 25px; font-size:16px; color:#ffffff; background-color:#0072C6; border-radius:5px; text-decoration:none;">Verify Email</a>
-      </p>
+  //     <!-- Header -->
+  //     <div style="background-color:#0072C6; color:#ffffff; text-align:center; padding:25px;">
+  //       <h2 style="margin:0; font-size:24px;">Welcome to Care Points Global</h2>
+  //       <p style="margin:5px 0 0; font-size:14px; opacity:0.85;">Secure your account by verifying your email</p>
+  //     </div>
 
-      <p style="line-height:1.6; margin-bottom:0;">
-        If you did not create this account, you can safely ignore this email.
-      </p>
+  //     <!-- Body -->
+  //     <div style="padding:25px; color:#333333;">
+  //       <h3 style="font-size:18px; margin-bottom:15px;">Hello Dear,</h3>
+  //       <p style="line-height:1.6; margin-bottom:20px;">
+  //         Thank you for registering with us! To complete your registration and activate your account, please verify your email address by clicking the button below:
+  //       </p>
 
-      <p style="margin-top:20px;">Best regards,<br>The Care Points Global Team</p>
-    </div>
+  //       <p style="text-align:center; margin-bottom:20px;">
+  //         <a href="${resetUILink}" style="display:inline-block; padding:12px 25px; font-size:16px; color:#ffffff; background-color:#0072C6; border-radius:5px; text-decoration:none;">Verify Email</a>
+  //       </p>
 
-    <!-- Footer -->
-    <div style="text-align:center; background-color:#f4f4f4; padding:20px; font-size:12px; color:#888888;">
-      <p style="margin:0;">&copy; 2026 Care Points Global</p>
-      <p style="margin:10px 0;">
-        <a href="#" style="color:#0072C6; text-decoration:none; margin:0 5px;">Privacy Policy</a> | 
-        <a href="#" style="color:#0072C6; text-decoration:none; margin:0 5px;">Terms of Service</a> | 
-        <a href="#" style="color:#0072C6; text-decoration:none; margin:0 5px;">Help Center</a>
-      </p>
-    </div>
+  //       <p style="line-height:1.6; margin-bottom:0;">
+  //         If you did not create this account, you can safely ignore this email.
+  //       </p>
 
-  </div>
-</body>
-`;
+  //       <p style="margin-top:20px;">Best regards,<br>The Care Points Global Team</p>
+  //     </div>
 
-  sendEmail(subject, email, html);
+  //     <!-- Footer -->
+  //     <div style="text-align:center; background-color:#f4f4f4; padding:20px; font-size:12px; color:#888888;">
+  //       <p style="margin:0;">&copy; 2026 Care Points Global</p>
+  //       <p style="margin:10px 0;">
+  //         <a href="#" style="color:#0072C6; text-decoration:none; margin:0 5px;">Privacy Policy</a> |
+  //         <a href="#" style="color:#0072C6; text-decoration:none; margin:0 5px;">Terms of Service</a> |
+  //         <a href="#" style="color:#0072C6; text-decoration:none; margin:0 5px;">Help Center</a>
+  //       </p>
+  //     </div>
+
+  //   </div>
+  // </body>
+  // `;
+
+  //   sendEmail(subject, email, html);
 
   if (user) {
     const result = await User.aggregate([
@@ -109,7 +130,13 @@ const createUserIntoDB = async (payload: TUser) => {
         },
       },
     ]);
-    return result[0];
+
+    const data = {
+      user: result[0],
+      refreshToken,
+      accessToken,
+    };
+    return data;
   }
 };
 
@@ -127,9 +154,7 @@ const getSingleUserFromDB = async (_id: string) => {
 };
 
 const getMeFromDB = async (email: string) => {
-  const userExists = await User.findOne({ email: email })
-    .select('-password')
-    .populate('subscribetionId');
+  const userExists = await User.findOne({ email: email }).select('-password');
 
   if (!userExists) {
     throw new AppError(httpStatus.NOT_FOUND, 'User Information is not found.');
@@ -137,17 +162,14 @@ const getMeFromDB = async (email: string) => {
   return userExists;
 };
 
-const updateUserFromDB = async (
-  _id: string,
-  file: any,
-  payload: Partial<TUser>,
-) => {
+const updateUserFromDB = async (_id: string, payload: Partial<TUser>) => {
   const userExists = await User.findById({ _id });
   if (!userExists) {
     throw new AppError(httpStatus.NOT_FOUND, 'User Information is not found.');
   }
 
   const existEmail = await User.findOne({ email: payload?.email });
+
   if (existEmail) {
     throw new AppError(httpStatus.FORBIDDEN, 'Duplicate Email address.');
   }

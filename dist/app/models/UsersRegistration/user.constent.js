@@ -9,5 +9,5 @@ exports.USER_ROLE = {
     sponsor: 'sponsor',
     ngo: 'ngo',
     employer: 'employer',
-    provider: 'provider'
+    provider: 'provider',
 };

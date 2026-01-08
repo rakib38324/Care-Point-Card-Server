@@ -50,28 +50,6 @@ userSchema.pre('save', async function (next) {
   }
 });
 
-// userSchema.pre('findOneAndUpdate', async function (next) {
-//   const update = this.getUpdate();
-
-//   // Type guard to check if update is of type UpdateQuery
-//   if (update && typeof update === 'object' && !Array.isArray(update)) {
-//     const updateObj = update as UpdateQuery<any>;
-
-//     // Check if the password field is being updated
-//     if (updateObj.password && typeof updateObj.password === 'string') {
-//       const hashedPassword = await bcrypt.hash(
-//         updateObj.password,
-//         Number(config.bcrypt_salt_round),
-//       );
-
-//       // Set the hashed password back to the update object
-//       updateObj.password = hashedPassword;
-//     }
-//   }
-
-//   next();
-// });
-
 userSchema.statics.isUserExistsByEmail = async function (email: string) {
   return await User.findOne({ email });
 };

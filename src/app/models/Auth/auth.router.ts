@@ -27,7 +27,17 @@ router.post(
 
 router.post(
   '/change-password',
-  Auth(USER_ROLE.admin, USER_ROLE.superAdmin),
+  Auth(
+    USER_ROLE.admin,
+    USER_ROLE.superAdmin,
+    USER_ROLE.doctor,
+    USER_ROLE.employer,
+    USER_ROLE.member,
+    USER_ROLE.ngo,
+    USER_ROLE.provider,
+    USER_ROLE.sponsor,
+    USER_ROLE.superAdmin,
+  ),
   ValidateRequest(authValidations.changePasswordValidationSchema),
   authControllers.changePassword,
 );

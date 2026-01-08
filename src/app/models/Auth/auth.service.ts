@@ -55,6 +55,13 @@ const resendEmailVerification = async (payload: { email: string }) => {
     );
   }
 
+  if (isUserExists.status !== 'Active') {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      `Your profile is currently ${isUserExists?.status}. Kindly contact the administrator for support.`,
+    );
+  }
+
   if (isUserExists?.verified) {
     throw new AppError(httpStatus.NOT_FOUND, 'Your email already verified.');
   }
@@ -78,7 +85,7 @@ const resendEmailVerification = async (payload: { email: string }) => {
   const html = `
     <div style="font-family: Arial, sans-serif; line-height: 1.5;">
       
-      <p>Dear ${name},</p>
+      <p>Hello Dear,</p>
       <p>Thank you for registering with us. To complete your registration, please verify your email address by clicking on the following link:</p>
        <p>
        <a href="${resetUILink}" style="color: #007bff; text-decoration: none;">Click here to verify your email</a>
@@ -107,10 +114,10 @@ const loginUser = async (payload: TLoginUser) => {
     );
   }
 
-  if (isUserExists?.status === 'Block') {
+  if (isUserExists?.status !== 'Active') {
     throw new AppError(
       httpStatus.FORBIDDEN,
-      'Your account temporary Blocked. Please contact with admin.',
+      `Your profile is currently ${isUserExists?.status}. Kindly contact the administrator for support.`,
     );
   }
 
@@ -153,15 +160,17 @@ const loginUser = async (payload: TLoginUser) => {
   );
 
   const userInformation = await User.findOne({ email: payload.email })
-    .populate({
-      path: 'subscribetionId', // Populate subscribetionId
-      select: '-createdAt -updatedAt', // Exclude createdAt and updatedAt fields from the populated Subscription document
-    })
     .select('-password -createdAt -updatedAt -passwordChangedAt') // Exclude password, createdAt, and updatedAt from the User document
     .exec();
 
+  const userData = {
+    email: userInformation?.email,
+    role: userInformation?.role,
+    status: userInformation?.status,
+  };
+
   return {
-    user: userInformation,
+    user: userData,
     token: accessToken,
     refreshToken: refreshToken,
   };
@@ -229,7 +238,7 @@ const forgetPassword = async (email: string) => {
   const resetToken = createToken(
     jwtPayload,
     config.jwt_access_secret as string,
-    '200m',
+    '20m',
   );
 
   const resetUILink = `${config.reset_password_ui_link}?email=${isUserExists.email}&token=${resetToken}`;
@@ -243,7 +252,7 @@ const forgetPassword = async (email: string) => {
         </div>
         <!-- Body -->
         <div style="padding: 20px; color: #333333;">
-            <h1 style="font-size: 20px; margin-bottom: 15px;">Dear ${name},</h1>
+            <h1 style="font-size: 20px; margin-bottom: 15px;">Hello Dear,</h1>
             <p style="line-height: 1.6; margin-bottom: 20px;">We received a request to reset your password. To proceed, please click the button below:</p>
             <p style="text-align: center; margin-bottom: 20px;">
                 <a href="${resetUILink}"  style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #ffffff; background-color: #3a2e5c; border-radius: 5px; text-decoration: none;">Reset Passowrd</a>
