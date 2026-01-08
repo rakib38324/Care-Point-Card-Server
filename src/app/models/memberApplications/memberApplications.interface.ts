@@ -1,11 +1,12 @@
 export type TMemberApplications = {
   _id: string;
   userId: string;
+  paymentId?: string;
 
   // ================= Personal Information =================
   fullName: string;
   dateOfBirth: string;
-  gender: 'Male' | 'Female' | 'Other';
+  gender: string;
   phoneNumber: string;
   whatsappNumber?: string;
   countryOfResidence: string;
@@ -13,10 +14,7 @@ export type TMemberApplications = {
   fullAddress: string;
 
   // ================= Membership Selection =================
-  membershipTier:
-    | 'Preventative Wellness Care'
-    | 'Disease Monitoring & Management'
-    | 'Family & Friends Plan';
+  membershipTier: string;
 
   familyMembers?: {
     fullName: string;
@@ -25,10 +23,7 @@ export type TMemberApplications = {
   }[];
 
   // ================= Health Information =================
-  currentHealthStatus:
-    | 'Health/Preventative focus'
-    | 'Managing chronic conditions'
-    | 'Other';
+  currentHealthStatus: string;
 
   existingConditions?: string;
 
@@ -36,12 +31,14 @@ export type TMemberApplications = {
 
   // ================= Onboarding =================
   bloodTestLocationPreference: string;
-  preferredConsultationDate: Date;
+  preferredConsultationDate: string;
   preferredConsultationTime: string; // e.g. "10:30 AM"
 
   // ================= Payment =================
   onboardingFee?: number;
   paymentMethod: string;
+  isPaid: boolean;
+  isDeleted: boolean;
 
   // ================= System Fields =================
   createdAt: Date;

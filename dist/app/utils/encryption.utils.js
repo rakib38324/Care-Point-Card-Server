@@ -9,7 +9,10 @@ const config_1 = __importDefault(require("../config/config"));
 const ALGORITHM = 'aes-256-cbc';
 const IV_LENGTH = 16;
 // Convert the key to Uint8Array
-const ENCRYPTION_KEY = new Uint8Array(crypto_1.default.createHash('sha256').update(config_1.default.data_encription_key).digest());
+const ENCRYPTION_KEY = new Uint8Array(crypto_1.default
+    .createHash('sha256')
+    .update(config_1.default.data_encription_key)
+    .digest());
 const encrypt = (text) => {
     const iv = crypto_1.default.randomBytes(IV_LENGTH);
     const ivArray = new Uint8Array(iv); // Convert iv to Uint8Array

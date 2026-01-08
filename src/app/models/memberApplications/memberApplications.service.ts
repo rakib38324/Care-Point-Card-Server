@@ -5,6 +5,10 @@ import { TMemberApplications } from './memberApplications.interface';
 import httpStatus from 'http-status-codes';
 import { MemberApplications } from './memberApplications.model';
 import { JwtPayload } from 'jsonwebtoken';
+import { decryptMemberApplicationPayload } from './memberApplications.decryptor';
+import { USER_ROLE } from '../UsersRegistration/user.constent';
+import { encryptObjectFields } from '../../utils/encryptObjectFields';
+import { encrypt } from '../../utils/encryption.utils';
 
 const createMemberIntoDB = async (
   userData: JwtPayload,
@@ -19,22 +23,29 @@ const createMemberIntoDB = async (
     );
   }
 
-  // cheack the application duplicate or not
-  const duplicateMemberApplication = await MemberApplications.findOne({
-    userId: payload?.userId,
+  const isAdminOrSuperAdmin =
+    userExists?.role === USER_ROLE.admin ||
+    userExists?.role === USER_ROLE.superAdmin;
+
+  const duplicateApplication = await MemberApplications.findOne({
+    userId: userData?._id,
   });
 
-  if (duplicateMemberApplication) {
+  if (duplicateApplication && !isAdminOrSuperAdmin) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      'You already applied for Individual subscriber enrollment form.',
+      'You have already applied for Individual Subscriber Enrollment.',
     );
   }
 
   // Encrypt sensitive fields before saving
-  const encryptedPayload = encryptMemberApplicationPayload(payload);
+  const encrypteddata = encryptMemberApplicationPayload(payload);
 
-  const createApplication = await MemberApplications.create(encryptedPayload);
+  const data = {
+    ...encrypteddata,
+    userId: userData?._id,
+  };
+  const createApplication = await MemberApplications.create(data);
 
   const applicationResponceData = {
     _id: createApplication?._id,
@@ -105,9 +116,179 @@ const createMemberIntoDB = async (
   //   sendEmail(subject, email, html);
 };
 
-const getSingleMemberApplicationFromDB = async () => {};
+const getSingleMemberApplicationFromDB = async (userData: JwtPayload) => {
+  const userExists = await User.findById({ _id: userData?._id });
+
+  if (!userExists) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'User account is not found.');
+  }
+
+  const applicationData = await MemberApplications.findOne({
+    userId: userData?._id,
+  });
+
+  if (applicationData) {
+    const result = decryptMemberApplicationPayload(applicationData);
+    return result;
+  } else {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Application informaion not found.',
+    );
+  }
+};
+
+const getAllMemberApplicationFromDB = async (userData: JwtPayload) => {
+  const userExists = await User.findById(userData._id);
+
+  if (!userExists) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'User account not found.');
+  }
+
+  // Only admin / superAdmin can access
+  if (
+    userExists.role !== USER_ROLE.superAdmin &&
+    userExists.role !== USER_ROLE.admin
+  ) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'Access denied. You do not have permission to view member applications.',
+    );
+  }
+
+  const applicationData = await MemberApplications.find().lean();
+
+  if (!applicationData.length) {
+    throw new AppError(httpStatus.NOT_FOUND, 'No member applications found.');
+  }
+
+  // 🔓 Decrypt each application
+  const result = applicationData.map((app) =>
+    decryptMemberApplicationPayload(app),
+  );
+
+  return result;
+};
+
+export const updateMemberApplicationFromDB = async (
+  userData: JwtPayload,
+  applicationId: string,
+  payload: Partial<TMemberApplications>,
+) => {
+  const application = await MemberApplications.findById(applicationId);
+
+  if (!application) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Application not found.');
+  }
+
+  const isOwner = application.userId.toString() === userData._id;
+  const isAdmin =
+    userData.role === USER_ROLE.admin || userData.role === USER_ROLE.superAdmin;
+
+  if (!isOwner && !isAdmin) {
+    throw new AppError(httpStatus.FORBIDDEN, 'Access denied.');
+  }
+
+  // 🔐 Fields to encrypt
+  const encryptedPayload = {
+    ...encryptObjectFields<TMemberApplications>(payload, [
+      'fullName',
+      'dateOfBirth',
+      'gender',
+      'phoneNumber',
+      'whatsappNumber',
+      'fullAddress',
+      'countryOfResidence',
+      'cityOrRegion',
+      'membershipTier',
+      'currentHealthStatus',
+      'currentMedications',
+      'existingConditions',
+      'bloodTestLocationPreference',
+      'preferredConsultationDate',
+      'preferredConsultationTime',
+    ]),
+
+    ...(payload.familyMembers && {
+      familyMembers: payload.familyMembers.map((member) => ({
+        fullName: encrypt(member.fullName),
+        relationship: encrypt(member.relationship),
+        dateOfBirth: member.dateOfBirth
+          ? encrypt(member.dateOfBirth.toString())
+          : undefined,
+      })),
+    }),
+  };
+
+  const updatedApplication = await MemberApplications.findByIdAndUpdate(
+    applicationId,
+    { $set: encryptedPayload },
+    { new: true, runValidators: true },
+  ).lean();
+
+  return updatedApplication;
+};
+
+export const deleteMemberApplicationFromDB = async (
+  userData: JwtPayload,
+  applicationId: string,
+) => {
+  const application = await MemberApplications.findById(applicationId);
+
+  if (!application || application.isDeleted) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Application not found.');
+  }
+
+  const isOwner = application.userId.toString() === userData._id;
+  const isAdminOrSuperAdmin =
+    userData.role === USER_ROLE.admin || userData.role === USER_ROLE.superAdmin;
+
+  if (!isOwner && !isAdminOrSuperAdmin) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'You are not allowed to delete this application.',
+    );
+  }
+
+  application.isDeleted = true;
+
+  await application.save();
+
+  return {
+    message: 'Application deleted successfully.',
+  };
+};
+
+const getMemberApplicationWithEmailFromDB = async (email: string) => {
+  const userExists = await User.findOne({ email });
+
+  if (!userExists) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invaid Email Address.');
+  }
+
+  const applicationData = await MemberApplications.find({
+    userId: userExists?._id,
+  });
+
+  if (!applicationData.length) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'No application found under this email.',
+    );
+  }
+
+  // 🔓 Decrypt each application
+  const result = applicationData.map((app) =>
+    decryptMemberApplicationPayload(app),
+  );
+
+  return result;
+};
 
 export const memberServices = {
   createMemberIntoDB,
   getSingleMemberApplicationFromDB,
+  getAllMemberApplicationFromDB,
+  deleteMemberApplicationFromDB,
+  getMemberApplicationWithEmailFromDB,
 };

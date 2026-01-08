@@ -18,8 +18,6 @@ const phoneRegex = /^\+[1-9]\d{7,14}$/;
 
 const createMemberApplicationValidationSchema = z.object({
   body: z.object({
-    userId: z.string().optional(),
-
     // ================= Personal Information =================
     fullName: z.string({ error: 'Full name is required.' }),
     dateOfBirth: z.string({ error: 'Date of birth is required.' }),

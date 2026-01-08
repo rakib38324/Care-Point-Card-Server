@@ -17,7 +17,6 @@ const familyMemberSchema = zod_1.z.object({
 const phoneRegex = /^\+[1-9]\d{7,14}$/;
 const createMemberApplicationValidationSchema = zod_1.z.object({
     body: zod_1.z.object({
-        userId: zod_1.z.string().optional(),
         // ================= Personal Information =================
         fullName: zod_1.z.string({ error: 'Full name is required.' }),
         dateOfBirth: zod_1.z.string({ error: 'Date of birth is required.' }),
@@ -46,11 +45,7 @@ const createMemberApplicationValidationSchema = zod_1.z.object({
         ], { error: 'Membership tier is required.' }),
         familyMembers: zod_1.z.array(familyMemberSchema).optional(),
         // ================= Health Information =================
-        currentHealthStatus: zod_1.z.enum([
-            'Health/Preventative focus',
-            'Managing chronic conditions',
-            'Other',
-        ], { error: 'Health status is required.' }),
+        currentHealthStatus: zod_1.z.enum(['Health/Preventative focus', 'Managing chronic conditions', 'Other'], { error: 'Health status is required.' }),
         existingConditions: zod_1.z.string().optional(),
         currentMedications: zod_1.z.string().optional(),
         // ================= Onboarding =================
@@ -80,7 +75,8 @@ const updateMemberApplicationValidationSchema = zod_1.z.object({
             .string({ error: 'Phone number is required.' })
             .refine((value) => phoneRegex.test(value), {
             message: 'Phone number must include a valid country code (e.g. +8801712345678).',
-        }).optional(),
+        })
+            .optional(),
         whatsappNumber: zod_1.z
             .string()
             .refine((value) => phoneRegex.test(value), {
