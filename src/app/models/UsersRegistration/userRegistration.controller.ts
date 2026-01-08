@@ -2,14 +2,24 @@ import httpStatus from 'http-status-codes';
 import catchAsync from '../../utils/catchAsync';
 import commonRes from '../../utils/commonResponse';
 import { UserServices } from './userRegistration.service';
+import config from '../../config/config';
 
 const createUsers = catchAsync(async (req, res) => {
   const result = await UserServices.createUserIntoDB(req.body);
+
+  res.cookie('refreshToken', result?.refreshToken, {
+    secure: config.NODE_ENV === 'production',
+    httpOnly: true,
+  });
+
   commonRes(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Registration completed successfully',
-    data: result,
+    data: {
+      user: result?.user,
+      token: result?.accessToken,
+    },
   });
 });
 
@@ -36,7 +46,7 @@ const getSingleUser = catchAsync(async (req, res) => {
 
 const updateUsers = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await UserServices.updateUserFromDB(id, req.file, req.body);
+  const result = await UserServices.updateUserFromDB(id, req.body);
   commonRes(res, {
     statusCode: httpStatus.OK,
     success: true,

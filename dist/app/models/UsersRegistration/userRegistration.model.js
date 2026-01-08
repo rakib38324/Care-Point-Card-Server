@@ -25,7 +25,16 @@ const userSchema = new mongoose_1.Schema({
     verified: { type: Boolean, default: false },
     role: {
         type: String,
-        enum: ['superAdmin', 'admin', 'member', 'docotr', 'sponsor', 'ngo', 'employer', 'provider'],
+        enum: [
+            'superAdmin',
+            'admin',
+            'member',
+            'docotr',
+            'sponsor',
+            'ngo',
+            'employer',
+            'provider',
+        ],
     },
     status: {
         type: String,
@@ -45,23 +54,6 @@ userSchema.pre('save', function (next) {
         }
     });
 });
-// userSchema.pre('findOneAndUpdate', async function (next) {
-//   const update = this.getUpdate();
-//   // Type guard to check if update is of type UpdateQuery
-//   if (update && typeof update === 'object' && !Array.isArray(update)) {
-//     const updateObj = update as UpdateQuery<any>;
-//     // Check if the password field is being updated
-//     if (updateObj.password && typeof updateObj.password === 'string') {
-//       const hashedPassword = await bcrypt.hash(
-//         updateObj.password,
-//         Number(config.bcrypt_salt_round),
-//       );
-//       // Set the hashed password back to the update object
-//       updateObj.password = hashedPassword;
-//     }
-//   }
-//   next();
-// });
 userSchema.statics.isUserExistsByEmail = function (email) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield exports.User.findOne({ email });

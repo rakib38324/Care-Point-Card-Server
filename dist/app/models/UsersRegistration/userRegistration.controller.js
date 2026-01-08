@@ -17,13 +17,21 @@ const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const commonResponse_1 = __importDefault(require("../../utils/commonResponse"));
 const userRegistration_service_1 = require("./userRegistration.service");
+const config_1 = __importDefault(require("../../config/config"));
 const createUsers = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield userRegistration_service_1.UserServices.createUserIntoDB(req.body);
+    res.cookie('refreshToken', result === null || result === void 0 ? void 0 : result.refreshToken, {
+        secure: config_1.default.NODE_ENV === 'production',
+        httpOnly: true,
+    });
     (0, commonResponse_1.default)(res, {
         statusCode: http_status_codes_1.default.OK,
         success: true,
         message: 'Registration completed successfully',
-        data: result,
+        data: {
+            user: result === null || result === void 0 ? void 0 : result.user,
+            token: result === null || result === void 0 ? void 0 : result.accessToken,
+        },
     });
 }));
 const getAllUsers = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -47,7 +55,7 @@ const getSingleUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
 }));
 const updateUsers = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const result = yield userRegistration_service_1.UserServices.updateUserFromDB(id, req.file, req.body);
+    const result = yield userRegistration_service_1.UserServices.updateUserFromDB(id, req.body);
     (0, commonResponse_1.default)(res, {
         statusCode: http_status_codes_1.default.OK,
         success: true,

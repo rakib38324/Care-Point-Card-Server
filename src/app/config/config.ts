@@ -27,4 +27,6 @@ export default {
 
   email_app_user: process.env.Email_APP_USER,
   email_app_password: process.env.Email_APP_PASSWORD,
+
+  data_encription_key: process.env.DATA_ENCRYPTION_KEY,
 };

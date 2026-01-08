@@ -4,6 +4,8 @@ const express_1 = require("express");
 const auth_router_1 = require("../models/Auth/auth.router");
 const userRegistration_router_1 = require("../models/UsersRegistration/userRegistration.router");
 const contact_router_1 = require("../models/Contact/contact.router");
+const memberApplications_router_1 = require("../models/memberApplications/memberApplications.router");
+const user_constent_1 = require("../models/UsersRegistration/user.constent");
 const router = (0, express_1.Router)();
 const moduleRouters = [
     {
@@ -17,6 +19,10 @@ const moduleRouters = [
     {
         path: '/contact',
         route: contact_router_1.contactRouter,
+    },
+    {
+        path: `/${user_constent_1.USER_ROLE.member}`,
+        route: memberApplications_router_1.memberRouters,
     },
 ];
 moduleRouters.forEach((route) => router.use(route.path, route.route));

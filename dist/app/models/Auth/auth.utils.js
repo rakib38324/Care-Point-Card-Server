@@ -18,9 +18,7 @@ exports.createToken = createToken;
 const VerifyToken = (token, secret) => {
     const decoded = jsonwebtoken_1.default.verify(token, secret);
     // Make sure all fields exist
-    if (!decoded.email ||
-        !decoded.role ||
-        !decoded._id) {
+    if (!decoded.email || !decoded.role || !decoded._id) {
         throw new Error('Invalid token payload');
     }
     return {

@@ -47,6 +47,9 @@ const resendEmailVerification = (payload) => __awaiter(void 0, void 0, void 0, f
     if (!isUserExists) {
         throw new appError_1.default(http_status_codes_1.default.NOT_FOUND, 'Invalid User Information, Please create your account.');
     }
+    if (isUserExists.status !== 'Active') {
+        throw new appError_1.default(http_status_codes_1.default.NOT_FOUND, `Your profile is currently ${isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.status}. Kindly contact the administrator for support.`);
+    }
     if (isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.verified) {
         throw new appError_1.default(http_status_codes_1.default.NOT_FOUND, 'Your email already verified.');
     }
@@ -62,7 +65,7 @@ const resendEmailVerification = (payload) => __awaiter(void 0, void 0, void 0, f
     const html = `
     <div style="font-family: Arial, sans-serif; line-height: 1.5;">
       
-      <p>Dear ${name},</p>
+      <p>Hello Dear,</p>
       <p>Thank you for registering with us. To complete your registration, please verify your email address by clicking on the following link:</p>
        <p>
        <a href="${resetUILink}" style="color: #007bff; text-decoration: none;">Click here to verify your email</a>
@@ -83,8 +86,8 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     if (!isUserExists) {
         throw new appError_1.default(http_status_codes_1.default.NOT_FOUND, 'User not found! Check your Email.');
     }
-    if ((isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.status) === 'Block') {
-        throw new appError_1.default(http_status_codes_1.default.FORBIDDEN, 'Your account temporary Blocked. Please contact with admin.');
+    if ((isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.status) !== 'Active') {
+        throw new appError_1.default(http_status_codes_1.default.FORBIDDEN, `Your profile is currently ${isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.status}. Kindly contact the administrator for support.`);
     }
     ///====> checking if the password is correct
     const isPasswordMatch = yield userRegistration_model_1.User.isPasswordMatched(payload === null || payload === void 0 ? void 0 : payload.password, isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.password);
@@ -105,14 +108,15 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     //===========> create refresh token and sent to the client
     const refreshToken = (0, auth_utils_1.createToken)(jwtPayload, config_1.default.jwt_refresh_secret, config_1.default.jwt_access_expires_in);
     const userInformation = yield userRegistration_model_1.User.findOne({ email: payload.email })
-        .populate({
-        path: 'subscribetionId', // Populate subscribetionId
-        select: '-createdAt -updatedAt', // Exclude createdAt and updatedAt fields from the populated Subscription document
-    })
         .select('-password -createdAt -updatedAt -passwordChangedAt') // Exclude password, createdAt, and updatedAt from the User document
         .exec();
+    const userData = {
+        email: userInformation === null || userInformation === void 0 ? void 0 : userInformation.email,
+        role: userInformation === null || userInformation === void 0 ? void 0 : userInformation.role,
+        status: userInformation === null || userInformation === void 0 ? void 0 : userInformation.status,
+    };
     return {
-        user: userInformation,
+        user: userData,
         token: accessToken,
         refreshToken: refreshToken,
     };
@@ -151,7 +155,7 @@ const forgetPassword = (email) => __awaiter(void 0, void 0, void 0, function* ()
         role: isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.role,
     };
     //===========> create token and sent to the client
-    const resetToken = (0, auth_utils_1.createToken)(jwtPayload, config_1.default.jwt_access_secret, '200m');
+    const resetToken = (0, auth_utils_1.createToken)(jwtPayload, config_1.default.jwt_access_secret, '20m');
     const resetUILink = `${config_1.default.reset_password_ui_link}?email=${isUserExists.email}&token=${resetToken}`;
     const subject = 'Password Reset Link From Care Point Server.';
     const html = `
@@ -163,7 +167,7 @@ const forgetPassword = (email) => __awaiter(void 0, void 0, void 0, function* ()
         </div>
         <!-- Body -->
         <div style="padding: 20px; color: #333333;">
-            <h1 style="font-size: 20px; margin-bottom: 15px;">Dear ${name},</h1>
+            <h1 style="font-size: 20px; margin-bottom: 15px;">Hello Dear,</h1>
             <p style="line-height: 1.6; margin-bottom: 20px;">We received a request to reset your password. To proceed, please click the button below:</p>
             <p style="text-align: center; margin-bottom: 20px;">
                 <a href="${resetUILink}"  style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #ffffff; background-color: #3a2e5c; border-radius: 5px; text-decoration: none;">Reset Passowrd</a>
