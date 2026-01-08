@@ -20,13 +20,13 @@ const familyMemberSchema = new Schema(
 const memberApplicationsSchema = new Schema<TMemberApplications>(
   {
     userId: Schema.Types.ObjectId,
+    paymentId: Schema.Types.ObjectId,
 
     // ================= Personal Information =================
     fullName: { type: String, required: true },
     dateOfBirth: { type: String, required: true },
     gender: {
       type: String,
-      enum: ['Male', 'Female', 'Other'],
       required: true,
     },
     phoneNumber: { type: String, required: true },
@@ -38,11 +38,6 @@ const memberApplicationsSchema = new Schema<TMemberApplications>(
     // ================= Membership Selection =================
     membershipTier: {
       type: String,
-      enum: [
-        'Preventative Wellness Care',
-        'Disease Monitoring & Management',
-        'Family & Friends Plan',
-      ],
       required: true,
     },
 
@@ -54,11 +49,6 @@ const memberApplicationsSchema = new Schema<TMemberApplications>(
     // ================= Health Information =================
     currentHealthStatus: {
       type: String,
-      enum: [
-        'Health/Preventative focus',
-        'Managing chronic conditions',
-        'Other',
-      ],
       required: true,
     },
 
@@ -71,7 +61,7 @@ const memberApplicationsSchema = new Schema<TMemberApplications>(
       required: true,
     },
     preferredConsultationDate: {
-      type: Date,
+      type: String,
       required: true,
     },
     preferredConsultationTime: {
@@ -87,6 +77,14 @@ const memberApplicationsSchema = new Schema<TMemberApplications>(
     paymentMethod: {
       type: String,
       required: true,
+    },
+    isPaid: {
+      type: Boolean,
+      default: false,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
   {

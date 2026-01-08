@@ -12,27 +12,33 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.memberServices = void 0;
+exports.memberServices = exports.deleteMemberApplicationFromDB = exports.updateMemberApplicationFromDB = void 0;
 const appError_1 = __importDefault(require("../../errors/appError"));
 const userRegistration_model_1 = require("../UsersRegistration/userRegistration.model");
 const memberApplications_encriptor_1 = require("./memberApplications.encriptor");
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const memberApplications_model_1 = require("./memberApplications.model");
+const memberApplications_decryptor_1 = require("./memberApplications.decryptor");
+const user_constent_1 = require("../UsersRegistration/user.constent");
+const encryptObjectFields_1 = require("../../utils/encryptObjectFields");
+const encryption_utils_1 = require("../../utils/encryption.utils");
 const createMemberIntoDB = (userData, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const userExists = yield userRegistration_model_1.User.findById({ _id: userData === null || userData === void 0 ? void 0 : userData._id });
     if (!userExists) {
         throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, 'User account is not created. Please go back previous step.');
     }
-    // cheack the application duplicate or not
-    const duplicateMemberApplication = yield memberApplications_model_1.MemberApplications.findOne({
-        userId: payload === null || payload === void 0 ? void 0 : payload.userId
+    const isAdminOrSuperAdmin = (userExists === null || userExists === void 0 ? void 0 : userExists.role) === user_constent_1.USER_ROLE.admin ||
+        (userExists === null || userExists === void 0 ? void 0 : userExists.role) === user_constent_1.USER_ROLE.superAdmin;
+    const duplicateApplication = yield memberApplications_model_1.MemberApplications.findOne({
+        userId: userData === null || userData === void 0 ? void 0 : userData._id,
     });
-    if (duplicateMemberApplication) {
-        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, 'You already applied for Individual subscriber enrollment form.');
+    if (duplicateApplication && !isAdminOrSuperAdmin) {
+        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, 'You have already applied for Individual Subscriber Enrollment.');
     }
     // Encrypt sensitive fields before saving
-    const encryptedPayload = (0, memberApplications_encriptor_1.encryptMemberApplicationPayload)(payload);
-    const createApplication = yield memberApplications_model_1.MemberApplications.create(encryptedPayload);
+    const encrypteddata = (0, memberApplications_encriptor_1.encryptMemberApplicationPayload)(payload);
+    const data = Object.assign(Object.assign({}, encrypteddata), { userId: userData === null || userData === void 0 ? void 0 : userData._id });
+    const createApplication = yield memberApplications_model_1.MemberApplications.create(data);
     const applicationResponceData = {
         _id: createApplication === null || createApplication === void 0 ? void 0 : createApplication._id,
         paymentMethod: createApplication === null || createApplication === void 0 ? void 0 : createApplication.paymentMethod,
@@ -88,9 +94,118 @@ const createMemberIntoDB = (userData, payload) => __awaiter(void 0, void 0, void
     // `;
     //   sendEmail(subject, email, html);
 });
-const getSingleMemberApplicationFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
+const getSingleMemberApplicationFromDB = (userData) => __awaiter(void 0, void 0, void 0, function* () {
+    const userExists = yield userRegistration_model_1.User.findById({ _id: userData === null || userData === void 0 ? void 0 : userData._id });
+    if (!userExists) {
+        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, 'User account is not found.');
+    }
+    const applicationData = yield memberApplications_model_1.MemberApplications.findOne({
+        userId: userData === null || userData === void 0 ? void 0 : userData._id
+    });
+    if (applicationData) {
+        const result = (0, memberApplications_decryptor_1.decryptMemberApplicationPayload)(applicationData);
+        return result;
+    }
+    else {
+        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, 'Application informaion not found.');
+    }
+});
+const getAllMemberApplicationFromDB = (userData) => __awaiter(void 0, void 0, void 0, function* () {
+    const userExists = yield userRegistration_model_1.User.findById(userData._id);
+    if (!userExists) {
+        throw new appError_1.default(http_status_codes_1.default.UNAUTHORIZED, 'User account not found.');
+    }
+    // Only admin / superAdmin can access
+    if (userExists.role !== user_constent_1.USER_ROLE.superAdmin &&
+        userExists.role !== user_constent_1.USER_ROLE.admin) {
+        throw new appError_1.default(http_status_codes_1.default.FORBIDDEN, 'Access denied. You do not have permission to view member applications.');
+    }
+    const applicationData = yield memberApplications_model_1.MemberApplications.find().lean();
+    if (!applicationData.length) {
+        throw new appError_1.default(http_status_codes_1.default.NOT_FOUND, 'No member applications found.');
+    }
+    // 🔓 Decrypt each application
+    const result = applicationData.map((app) => (0, memberApplications_decryptor_1.decryptMemberApplicationPayload)(app));
+    return result;
+});
+const updateMemberApplicationFromDB = (userData, applicationId, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const application = yield memberApplications_model_1.MemberApplications.findById(applicationId);
+    if (!application) {
+        throw new appError_1.default(http_status_codes_1.default.NOT_FOUND, 'Application not found.');
+    }
+    const isOwner = application.userId.toString() === userData._id;
+    const isAdmin = userData.role === user_constent_1.USER_ROLE.admin ||
+        userData.role === user_constent_1.USER_ROLE.superAdmin;
+    if (!isOwner && !isAdmin) {
+        throw new appError_1.default(http_status_codes_1.default.FORBIDDEN, 'Access denied.');
+    }
+    // 🔐 Fields to encrypt
+    const encryptedPayload = Object.assign(Object.assign({}, (0, encryptObjectFields_1.encryptObjectFields)(payload, [
+        'fullName',
+        'dateOfBirth',
+        'gender',
+        'phoneNumber',
+        'whatsappNumber',
+        'fullAddress',
+        'countryOfResidence',
+        'cityOrRegion',
+        'membershipTier',
+        'currentHealthStatus',
+        'currentMedications',
+        'existingConditions',
+        'bloodTestLocationPreference',
+        'preferredConsultationDate',
+        'preferredConsultationTime',
+    ])), (payload.familyMembers && {
+        familyMembers: payload.familyMembers.map((member) => ({
+            fullName: (0, encryption_utils_1.encrypt)(member.fullName),
+            relationship: (0, encryption_utils_1.encrypt)(member.relationship),
+            dateOfBirth: member.dateOfBirth
+                ? (0, encryption_utils_1.encrypt)(member.dateOfBirth.toString())
+                : undefined,
+        })),
+    }));
+    const updatedApplication = yield memberApplications_model_1.MemberApplications.findByIdAndUpdate(applicationId, { $set: encryptedPayload }, { new: true, runValidators: true }).lean();
+    return updatedApplication;
+});
+exports.updateMemberApplicationFromDB = updateMemberApplicationFromDB;
+const deleteMemberApplicationFromDB = (userData, applicationId) => __awaiter(void 0, void 0, void 0, function* () {
+    const application = yield memberApplications_model_1.MemberApplications.findById(applicationId);
+    if (!application || application.isDeleted) {
+        throw new appError_1.default(http_status_codes_1.default.NOT_FOUND, 'Application not found.');
+    }
+    const isOwner = application.userId.toString() === userData._id;
+    const isAdminOrSuperAdmin = userData.role === user_constent_1.USER_ROLE.admin ||
+        userData.role === user_constent_1.USER_ROLE.superAdmin;
+    if (!isOwner && !isAdminOrSuperAdmin) {
+        throw new appError_1.default(http_status_codes_1.default.FORBIDDEN, 'You are not allowed to delete this application.');
+    }
+    application.isDeleted = true;
+    yield application.save();
+    return {
+        message: 'Application deleted successfully.',
+    };
+});
+exports.deleteMemberApplicationFromDB = deleteMemberApplicationFromDB;
+const getMemberApplicationWithEmailFromDB = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    const userExists = yield userRegistration_model_1.User.findOne({ email });
+    if (!userExists) {
+        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, 'Invaid Email Address.');
+    }
+    const applicationData = yield memberApplications_model_1.MemberApplications.find({
+        userId: userExists === null || userExists === void 0 ? void 0 : userExists._id
+    });
+    if (!applicationData.length) {
+        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, 'No application found under this email.');
+    }
+    // 🔓 Decrypt each application
+    const result = applicationData.map((app) => (0, memberApplications_decryptor_1.decryptMemberApplicationPayload)(app));
+    return result;
 });
 exports.memberServices = {
     createMemberIntoDB,
-    getSingleMemberApplicationFromDB
+    getSingleMemberApplicationFromDB,
+    getAllMemberApplicationFromDB,
+    deleteMemberApplicationFromDB: exports.deleteMemberApplicationFromDB,
+    getMemberApplicationWithEmailFromDB
 };

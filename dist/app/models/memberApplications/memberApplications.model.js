@@ -16,12 +16,12 @@ const familyMemberSchema = new mongoose_1.Schema({
  */
 const memberApplicationsSchema = new mongoose_1.Schema({
     userId: mongoose_1.Schema.Types.ObjectId,
+    paymentId: mongoose_1.Schema.Types.ObjectId,
     // ================= Personal Information =================
     fullName: { type: String, required: true },
     dateOfBirth: { type: String, required: true },
     gender: {
         type: String,
-        enum: ['Male', 'Female', 'Other'],
         required: true,
     },
     phoneNumber: { type: String, required: true },
@@ -32,11 +32,6 @@ const memberApplicationsSchema = new mongoose_1.Schema({
     // ================= Membership Selection =================
     membershipTier: {
         type: String,
-        enum: [
-            'Preventative Wellness Care',
-            'Disease Monitoring & Management',
-            'Family & Friends Plan',
-        ],
         required: true,
     },
     familyMembers: {
@@ -46,11 +41,6 @@ const memberApplicationsSchema = new mongoose_1.Schema({
     // ================= Health Information =================
     currentHealthStatus: {
         type: String,
-        enum: [
-            'Health/Preventative focus',
-            'Managing chronic conditions',
-            'Other',
-        ],
         required: true,
     },
     existingConditions: { type: String },
@@ -61,7 +51,7 @@ const memberApplicationsSchema = new mongoose_1.Schema({
         required: true,
     },
     preferredConsultationDate: {
-        type: Date,
+        type: String,
         required: true,
     },
     preferredConsultationTime: {
@@ -77,6 +67,14 @@ const memberApplicationsSchema = new mongoose_1.Schema({
         type: String,
         required: true,
     },
+    isPaid: {
+        type: Boolean,
+        default: false,
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false,
+    }
 }, {
     timestamps: true,
 });
