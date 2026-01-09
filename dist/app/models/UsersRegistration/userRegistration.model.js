@@ -45,13 +45,30 @@ const userSchema = new mongoose_1.Schema({
 }, {
     timestamps: true,
 });
-userSchema.pre('save', function (next) {
+// userSchema.pre('save', async function (next: any) {
+//   const userDoc = this;
+//   //==========> Hash the current password if it exists
+//   if (userDoc.password && typeof userDoc.password === 'string') {
+//     userDoc.password = await bcrypt.hash(
+//       userDoc.password,
+//       Number(config.bcrypt_salt_round),
+//     );
+//   }
+//   next();
+// });
+// Removed 'next' argument
+userSchema.pre('save', function () {
     return __awaiter(this, void 0, void 0, function* () {
-        const user = this;
-        //==========> Hash the current password if it exists
-        if (user.password && typeof user.password === 'string') {
-            user.password = yield bcrypt_1.default.hash(user.password, Number(config_1.default.bcrypt_salt_round));
+        const userDoc = this;
+        // Only hash the password if it has been modified (or is new)
+        // This prevents double-hashing when updating other user fields
+        if (!userDoc.isModified('password')) {
+            return;
         }
+        if (userDoc.password && typeof userDoc.password === 'string') {
+            userDoc.password = yield bcrypt_1.default.hash(userDoc.password, Number(config_1.default.bcrypt_salt_round));
+        }
+        // No next() needed here for async functions
     });
 });
 userSchema.statics.isUserExistsByEmail = function (email) {

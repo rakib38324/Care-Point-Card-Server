@@ -98,5 +98,5 @@ exports.ngoApplicationControllers = {
     getAllNGOApplications,
     updateNGOApplication,
     deleteNGOApplication,
-    getNGOApplicationsWithEmail
+    getNGOApplicationsWithEmail,
 };

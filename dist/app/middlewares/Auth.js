@@ -41,7 +41,7 @@ const Auth = (...requiredRole) => {
         }
         if (isUserExists.passwordChangedAt &&
             userRegistration_model_1.User.isJWTIssuedBeforePasswordChanged(isUserExists.passwordChangedAt, iat)) {
-            throw new appError_1.default(http_status_codes_1.default.UNAUTHORIZED, 'You are not Authorized');
+            throw new appError_1.default(http_status_codes_1.default.UNAUTHORIZED, 'You are not Authorized...');
         }
         if (requiredRole && !requiredRole.includes(role)) {
             throw new appError_1.default(http_status_codes_1.default.UNAUTHORIZED, 'You are not Authorized');

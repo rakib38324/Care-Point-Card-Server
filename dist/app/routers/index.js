@@ -8,6 +8,7 @@ const memberApplications_router_1 = require("../models/memberApplications/member
 const user_constent_1 = require("../models/UsersRegistration/user.constent");
 const sponsorApplications_router_1 = require("../models/sponsorApplications/sponsorApplications.router");
 const ngoApplication_router_1 = require("../models/ngoApplication/ngoApplication.router");
+const employerApplication_router_1 = require("../models/employerApplication/employerApplication.router");
 const router = (0, express_1.Router)();
 const moduleRouters = [
     {
@@ -33,6 +34,10 @@ const moduleRouters = [
     {
         path: `/${user_constent_1.USER_ROLE.ngo}`,
         route: ngoApplication_router_1.ngoApplicationRoutes,
+    },
+    {
+        path: `/${user_constent_1.USER_ROLE.employer}`,
+        route: employerApplication_router_1.employerRouters,
     },
 ];
 moduleRouters.forEach((route) => router.use(route.path, route.route));
