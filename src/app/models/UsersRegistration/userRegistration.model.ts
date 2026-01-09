@@ -38,16 +38,38 @@ const userSchema = new Schema<TUser, UserModel>(
   },
 );
 
-userSchema.pre('save', async function (next) {
-  const user = this;
+// userSchema.pre('save', async function (next: any) {
+//   const userDoc = this;
 
-  //==========> Hash the current password if it exists
-  if (user.password && typeof user.password === 'string') {
-    user.password = await bcrypt.hash(
-      user.password,
+//   //==========> Hash the current password if it exists
+//   if (userDoc.password && typeof userDoc.password === 'string') {
+//     userDoc.password = await bcrypt.hash(
+//       userDoc.password,
+//       Number(config.bcrypt_salt_round),
+//     );
+//   }
+
+//   next();
+// });
+
+// Removed 'next' argument
+userSchema.pre('save', async function () {
+  const userDoc = this as any;
+
+  // Only hash the password if it has been modified (or is new)
+  // This prevents double-hashing when updating other user fields
+  if (!userDoc.isModified('password')) {
+    return;
+  }
+
+  if (userDoc.password && typeof userDoc.password === 'string') {
+    userDoc.password = await bcrypt.hash(
+      userDoc.password,
       Number(config.bcrypt_salt_round),
     );
   }
+
+  // No next() needed here for async functions
 });
 
 userSchema.statics.isUserExistsByEmail = async function (email: string) {

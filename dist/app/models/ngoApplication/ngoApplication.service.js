@@ -74,7 +74,9 @@ const getSingleNGOApplicationFromDB = (userData) => __awaiter(void 0, void 0, vo
  */
 const getAllNGOApplicationsFromDB = (userData) => __awaiter(void 0, void 0, void 0, function* () {
     const userExists = yield userRegistration_model_1.User.findById(userData._id);
-    if (!userExists || (userExists.role !== user_constent_1.USER_ROLE.admin && userExists.role !== user_constent_1.USER_ROLE.superAdmin)) {
+    if (!userExists ||
+        (userExists.role !== user_constent_1.USER_ROLE.admin &&
+            userExists.role !== user_constent_1.USER_ROLE.superAdmin)) {
         throw new appError_1.default(http_status_codes_1.default.FORBIDDEN, 'Unauthorized access.');
     }
     const applications = yield ngoApplication_model_1.NGOApplication.find().lean();
@@ -191,5 +193,5 @@ exports.ngoApplicationServices = {
     getAllNGOApplicationsFromDB,
     updateNGOApplicationInDB,
     deleteNGOApplicationFromDB,
-    getNGOApplicationWithEmailFromDB
+    getNGOApplicationWithEmailFromDB,
 };

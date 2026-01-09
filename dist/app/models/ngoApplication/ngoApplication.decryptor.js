@@ -14,9 +14,7 @@ const decryptNGOApplicationPayload = (payload) => {
         registrationNumber: (0, encryption_utils_1.decrypt)(payload.registrationNumber),
         countryOfRegistration: (0, encryption_utils_1.decrypt)(payload.countryOfRegistration),
         headquartersAddress: (0, encryption_utils_1.decrypt)(payload.headquartersAddress),
-        website: payload.website
-            ? (0, encryption_utils_1.decrypt)(payload.website)
-            : undefined,
+        website: payload.website ? (0, encryption_utils_1.decrypt)(payload.website) : undefined,
         // ================= Primary Contact Person =================
         primaryContact: {
             fullName: (0, encryption_utils_1.decrypt)(payload.primaryContact.fullName),

@@ -14,6 +14,7 @@ const ENCRYPTION_KEY = new Uint8Array(crypto_1.default
     .update(config_1.default.data_encription_key)
     .digest());
 const encrypt = (text) => {
+    console.log(text);
     const iv = crypto_1.default.randomBytes(IV_LENGTH);
     const ivArray = new Uint8Array(iv); // Convert iv to Uint8Array
     const cipher = crypto_1.default.createCipheriv(ALGORITHM, ENCRYPTION_KEY, ivArray);
