@@ -4,7 +4,7 @@ import notFound from './app/middlewares/notFound';
 import router from './app/routers';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import cookieParser from 'cookie-parser';
-import { auditMiddleware } from './app/models/auditLogs/audit.middleware';
+import { auditMiddleware } from './app/middlewares/audit.middleware';
 
 const app: Application = express();
 

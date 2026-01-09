@@ -7,6 +7,7 @@ export type TAuditLog = {
 
   resource?: string; // employerApplication, memberApplication
   resourceId?: [string];
+  onModel?: string;
 
   method: string; // GET, POST, PUT
   endpoint: string; // /api/v1/employer/apply

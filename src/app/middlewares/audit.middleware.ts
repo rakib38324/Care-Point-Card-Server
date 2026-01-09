@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { auditLogger } from './auditLogs';
-import { USER_ROLE } from '../UsersRegistration/user.constent';
+import { auditLogger } from '../models/auditLogs/auditLogs';
+import { USER_ROLE } from '../models/UsersRegistration/user.constent';
 
 // ----------------- Audit Middleware -----------------
 export const auditMiddleware = (
@@ -19,6 +19,7 @@ export const auditMiddleware = (
         resource: extractResource(req),
         resourceId: resourceIds,
         statusCode: res.statusCode,
+        onModel: getModelName(req),
       });
     } catch (err) {
       console.error('Audit Middleware Error:', err);
@@ -75,6 +76,18 @@ const getResourceId = (req: Request, res?: Response): string[] => {
 
   // 4️ fallback
   return [];
+};
+
+const getModelName = (req: Request): string => {
+  const url = req.originalUrl;
+  if (url.includes(`/${USER_ROLE.admin}/`)) return 'User';
+  if (url.includes(`/${USER_ROLE.superAdmin}/`)) return 'User';
+  if (url.includes(`/${USER_ROLE.employer}/`)) return 'EmployerApplication';
+  if (url.includes(`/${USER_ROLE.member}/`)) return 'MemberApplications';
+  if (url.includes(`/${USER_ROLE.ngo}/`)) return 'NGOApplication';
+  if (url.includes(`/${USER_ROLE.sponsor}/`)) return 'SponsorApplications';
+
+  return 'User'; // Default fallback
 };
 
 const extractResource = (req: Request) => {

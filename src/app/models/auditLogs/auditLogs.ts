@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { AuditLog } from './auditLogs.model';
+import { encrypt } from '../../utils/encryption.utils';
 
 export const auditLogger = async ({
   req,
@@ -8,6 +9,7 @@ export const auditLogger = async ({
   resource,
   resourceId,
   statusCode,
+  onModel,
 }: {
   req: any;
   res: any;
@@ -15,6 +17,7 @@ export const auditLogger = async ({
   resource?: string;
   resourceId?: string[] | [];
   statusCode: number;
+  onModel: string;
 }) => {
   try {
     const actingUser = req.user || res.locals.createdResource;
@@ -26,6 +29,7 @@ export const auditLogger = async ({
       action, // Captures 'What'
       resource,
       resourceId: resourceId,
+      onModel,
 
       endpoint: req.originalUrl,
       method: req.method,
@@ -35,7 +39,7 @@ export const auditLogger = async ({
 
       // Compliance: Hash IP to protect privacy while maintaining auditability
       ipHash: req?.ip
-        ? crypto.createHash('sha256').update(req.ip).digest('hex')
+        ? encrypt(req?.ip || req.connection.remoteAddress || '')
         : undefined,
       userAgent: req.headers['user-agent'],
     });

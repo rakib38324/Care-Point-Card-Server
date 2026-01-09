@@ -8,7 +8,21 @@ const auditLogSchema = new Schema<TAuditLog>(
 
     action: { type: String, required: true },
     resource: { type: String },
-    resourceId: { type: [Schema.Types.ObjectId], default: undefined },
+    // resourceId: { type: [Schema.Types.ObjectId], default: undefined },
+
+    // The magic happens here
+    resourceId: [
+      {
+        type: Schema.Types.ObjectId,
+        refPath: 'onModel',
+      },
+    ],
+
+    onModel: {
+      type: String,
+      // required: true,
+      // enum: ['User', 'EmployerApplication', 'MemberApplications', 'NGOApplication', 'SponsorApplications','Payment']
+    },
 
     method: { type: String, required: true },
     endpoint: { type: String, required: true },
