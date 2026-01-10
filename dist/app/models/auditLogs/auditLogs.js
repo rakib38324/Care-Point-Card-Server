@@ -17,7 +17,7 @@ const auditLogger = (_a) => __awaiter(void 0, [_a], void 0, function* ({ req, re
         const actingUser = req.user || res.locals.createdResource;
         yield auditLogs_model_1.AuditLog.create({
             actorId: (actingUser === null || actingUser === void 0 ? void 0 : actingUser._id) || null, // Captures 'Who'
-            actorRole: (actingUser === null || actingUser === void 0 ? void 0 : actingUser.role) || 'GUEST',
+            actorRole: (actingUser === null || actingUser === void 0 ? void 0 : actingUser.role) || 'UNKNOWN',
             action, // Captures 'What'
             resource,
             resourceId: resourceId,

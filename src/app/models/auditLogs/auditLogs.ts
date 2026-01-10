@@ -24,7 +24,7 @@ export const auditLogger = async ({
 
     await AuditLog.create({
       actorId: actingUser?._id || null, // Captures 'Who'
-      actorRole: actingUser?.role || 'GUEST',
+      actorRole: actingUser?.role || 'UNKNOWN',
 
       action, // Captures 'What'
       resource,

@@ -15,7 +15,7 @@ const createApplicationTypeValidationSchema = zod_1.z.object({
             `${user_constent_1.USER_ROLE.member}`,
             `${user_constent_1.USER_ROLE.ngo}`,
             `${user_constent_1.USER_ROLE.provider}`,
-            `${user_constent_1.USER_ROLE.sponsor}`
+            `${user_constent_1.USER_ROLE.sponsor}`,
         ]),
         isDeleted: zod_1.z.boolean().optional().default(false),
     }),
@@ -24,7 +24,8 @@ const updateApplicationTypeValidationSchema = zod_1.z.object({
     body: zod_1.z.object({
         applicantTitle: zod_1.z.string().trim().optional(),
         price: zod_1.z.number().min(0).optional(),
-        userRole: zod_1.z.enum([
+        userRole: zod_1.z
+            .enum([
             `${user_constent_1.USER_ROLE.admin}`,
             `${user_constent_1.USER_ROLE.superAdmin}`,
             `${user_constent_1.USER_ROLE.doctor}`,
@@ -32,8 +33,9 @@ const updateApplicationTypeValidationSchema = zod_1.z.object({
             `${user_constent_1.USER_ROLE.member}`,
             `${user_constent_1.USER_ROLE.ngo}`,
             `${user_constent_1.USER_ROLE.provider}`,
-            `${user_constent_1.USER_ROLE.sponsor}`
-        ]).optional(),
+            `${user_constent_1.USER_ROLE.sponsor}`,
+        ])
+            .optional(),
         isDeleted: zod_1.z.boolean().optional(),
     }),
 });

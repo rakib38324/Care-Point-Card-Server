@@ -8,12 +8,12 @@ const applicationTypeSchema = new mongoose_1.Schema({
         type: String,
         required: true,
         trim: true,
-        unique: true
+        unique: true,
     },
     price: {
         type: Number,
         required: true,
-        min: 0
+        min: 0,
     },
     userRole: {
         type: String,
@@ -21,7 +21,7 @@ const applicationTypeSchema = new mongoose_1.Schema({
     },
     isDeleted: {
         type: Boolean,
-        default: false
+        default: false,
     },
 }, {
     timestamps: true,

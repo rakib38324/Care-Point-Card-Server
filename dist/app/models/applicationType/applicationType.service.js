@@ -20,13 +20,20 @@ const userRegistration_model_1 = require("../UsersRegistration/userRegistration.
 const applicationType_model_1 = require("./applicationType.model");
 const createApplicationTypeIntoDB = (userData, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const userExists = yield userRegistration_model_1.User.findById(userData === null || userData === void 0 ? void 0 : userData._id);
-    if (!userExists || (userExists.role !== user_constent_1.USER_ROLE.admin && userExists.role !== user_constent_1.USER_ROLE.superAdmin)) {
+    if (!userExists ||
+        (userExists.role !== user_constent_1.USER_ROLE.admin &&
+            userExists.role !== user_constent_1.USER_ROLE.superAdmin)) {
         throw new appError_1.default(http_status_codes_1.default.FORBIDDEN, 'Unauthorized access.');
     }
     return yield applicationType_model_1.ApplicationType.create(payload);
 });
 const getAllApplicationTypesFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
-    return yield applicationType_model_1.ApplicationType.find({ isDeleted: false }).select(['-isDeleted', '-createdAt', '-updatedAt', '-__v']);
+    return yield applicationType_model_1.ApplicationType.find({ isDeleted: false }).select([
+        '-isDeleted',
+        '-createdAt',
+        '-updatedAt',
+        '-__v',
+    ]);
 });
 const getSingleApplicationTypeFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield applicationType_model_1.ApplicationType.findById(id);
