@@ -28,7 +28,7 @@ const createUserIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function
     if ((payload === null || payload === void 0 ? void 0 : payload.role) === 'superAdmin' || (payload === null || payload === void 0 ? void 0 : payload.role) === 'admin') {
         throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, 'Only Super admin can create Admin or Super Admin account.');
     }
-    const userInfo = Object.assign(Object.assign({}, payload), { verified: true, passwordChangedAt: new Date() });
+    const userInfo = Object.assign(Object.assign({}, payload), { verified: true });
     const user = yield userRegistration_model_1.User.create(userInfo);
     //-====> access granted: send accessToken, RefreshToken
     const jwtPayload = {

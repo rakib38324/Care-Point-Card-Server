@@ -75,7 +75,7 @@ const createMemberApplicationValidationSchema = z.object({
     }),
 
     // ================= Payment =================
-    onboardingFee: z.number().optional(),
+    onboardingFee: z.number({ error: 'onboarding Fee is required.' }),
     paymentMethod: z.string({ error: 'Payment method is required.' }),
     notification: z.boolean().optional(),
     PrivacyPolicyHIPAA: z

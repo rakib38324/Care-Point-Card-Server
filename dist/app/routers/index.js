@@ -10,6 +10,7 @@ const sponsorApplications_router_1 = require("../models/sponsorApplications/spon
 const ngoApplication_router_1 = require("../models/ngoApplication/ngoApplication.router");
 const employerApplication_router_1 = require("../models/employerApplication/employerApplication.router");
 const auditLogs_router_1 = require("../models/auditLogs/auditLogs.router");
+const applicationType_router_1 = require("../models/applicationType/applicationType.router");
 const router = (0, express_1.Router)();
 const moduleRouters = [
     {
@@ -43,6 +44,10 @@ const moduleRouters = [
     {
         path: `/audit`,
         route: auditLogs_router_1.AuditRoutes,
+    },
+    {
+        path: `/application-types`,
+        route: applicationType_router_1.ApplicationTypeRoutes,
     },
 ];
 moduleRouters.forEach((route) => router.use(route.path, route.route));

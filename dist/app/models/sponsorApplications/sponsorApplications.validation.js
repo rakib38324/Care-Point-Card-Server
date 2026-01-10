@@ -64,7 +64,7 @@ const createSponsorValidationSchema = zod_1.z.object({
         // ================= Payment & Billing =================
         totalOnboardingFees: zod_1.z.number({
             error: 'Total onboarding fees are required.',
-        }),
+        }).min(1),
         membershipFeeEstimate: zod_1.z.string().optional(),
         paymentMethod: zod_1.z.enum(['Credit/Debit Card', 'Bank Transfer', 'Mobile Money'], {
             error: 'Payment method is required.',

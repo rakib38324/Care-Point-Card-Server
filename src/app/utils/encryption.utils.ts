@@ -13,7 +13,6 @@ const ENCRYPTION_KEY = new Uint8Array(
 );
 
 export const encrypt = (text: string): string => {
-  console.log(text);
   const iv = crypto.randomBytes(IV_LENGTH);
   const ivArray = new Uint8Array(iv); // Convert iv to Uint8Array
 

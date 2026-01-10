@@ -8,6 +8,7 @@ import { spondorRouters } from '../models/sponsorApplications/sponsorApplication
 import { ngoApplicationRoutes } from '../models/ngoApplication/ngoApplication.router';
 import { employerRouters } from '../models/employerApplication/employerApplication.router';
 import { AuditRoutes } from '../models/auditLogs/auditLogs.router';
+import { ApplicationTypeRoutes } from '../models/applicationType/applicationType.router';
 
 const router = Router();
 
@@ -43,6 +44,10 @@ const moduleRouters = [
   {
     path: `/audit`,
     route: AuditRoutes,
+  },
+  {
+    path: `/application-types`,
+    route: ApplicationTypeRoutes,
   },
 ];
 

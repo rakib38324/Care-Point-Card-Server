@@ -59,7 +59,7 @@ const createMemberApplicationValidationSchema = zod_1.z.object({
             error: 'Preferred consultation time is required.',
         }),
         // ================= Payment =================
-        onboardingFee: zod_1.z.number().optional(),
+        onboardingFee: zod_1.z.number({ error: 'onboarding Fee is required.' }),
         paymentMethod: zod_1.z.string({ error: 'Payment method is required.' }),
         notification: zod_1.z.boolean().optional(),
         PrivacyPolicyHIPAA: zod_1.z

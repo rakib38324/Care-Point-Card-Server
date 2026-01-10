@@ -18,7 +18,7 @@ const createUsers = catchAsync(async (req, res) => {
     message: 'Registration completed successfully',
     data: {
       user: result?.user,
-      token: result?.accessToken,
+      accessToken: result?.accessToken,
     },
   });
 

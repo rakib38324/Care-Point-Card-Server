@@ -29,7 +29,6 @@ const createUserIntoDB = async (payload: TUser) => {
   const userInfo = {
     ...payload,
     verified: true,
-    passwordChangedAt: new Date(),
   };
 
   const user = await User.create(userInfo);
