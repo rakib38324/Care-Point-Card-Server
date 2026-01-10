@@ -46,7 +46,7 @@ const moduleRouters = [
     route: AuditRoutes,
   },
   {
-    path: `/application`,
+    path: `/application-types`,
     route: ApplicationTypeRoutes,
   },
 ];

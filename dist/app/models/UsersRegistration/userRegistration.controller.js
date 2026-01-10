@@ -30,7 +30,7 @@ const createUsers = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
         message: 'Registration completed successfully',
         data: {
             user: result === null || result === void 0 ? void 0 : result.user,
-            token: result === null || result === void 0 ? void 0 : result.accessToken,
+            accessToken: result === null || result === void 0 ? void 0 : result.accessToken,
         },
     });
     // Save ID for audit
